@@ -1,0 +1,21 @@
+{
+  "name": "placement-portal-major-project",
+  "version": "1.0.0",
+  "description": "Smart Career Portal with AI Resume Ranking (Major Project BIS785)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kaushal-Prakash/placement-portal-major-project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/kaushal-Prakash/placement-portal-major-project/issues"
+  },
+  "homepage": "https://github.com/kaushal-Prakash/placement-portal-major-project#readme"
+}
