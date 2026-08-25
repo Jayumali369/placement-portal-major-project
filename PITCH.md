@@ -1,6 +1,6 @@
 # 🎤 Project Pitch & Defense Guide: Smart Career Portal
 
-This document is designed to help you present your Major Project to evaluators. It is structured to logically answer the "Why," "What," and "How," while defending your core features against critical questions.
+It contains structured logical explanation to answer the "Why," "What," and "How," while defending core features against critical questions.
 
 ## ❓ The "Why": The Problem with Current Systems
 

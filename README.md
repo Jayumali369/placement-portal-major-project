@@ -68,7 +68,7 @@ The platform is built on a robust, scalable 3-tier architecture:
 
 ### Main Backend (API & Business Logic)
 - **Framework:** Node.js with Express.js
-- **Database:** PostgreSQL for secure, relational data management.
+- **Database:** MongoDB
 - **Role:** Handles secure user authentication, job postings, application routing, and acts as the central hub communicating with the client and AI microservice.
 
 ### AI Backend (Machine Learning Microservice)
