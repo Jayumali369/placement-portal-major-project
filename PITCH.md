@@ -1,6 +1,4 @@
-# 🎤 Project Pitch & Defense Guide: Smart Career Portal
-
-It contains structured logical explanation to answer the "Why," "What," and "How," while defending core features against critical questions.
+# 🎤 Project Pitch & Defense: Smart Career Portal - The Why, What & How
 
 ## ❓ The "Why": The Problem with Current Systems
 
