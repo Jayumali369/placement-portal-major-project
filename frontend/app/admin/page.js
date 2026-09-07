@@ -6,6 +6,8 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [jobs, setJobs] = useState([]);
+  const [applications, setApplications] = useState({});
+  const [viewingJobId, setViewingJobId] = useState(null);
   
   const [formData, setFormData] = useState({
     title: "",
@@ -35,7 +37,7 @@ export default function AdminDashboard() {
   }, []);
 
   const fetchJobs = () => {
-    fetch("http://localhost:5000/api/jobs")
+    fetch("http://localhost:5001/api/jobs")
       .then(res => res.json())
       .then(data => setJobs(data))
       .catch(err => console.error(err));
@@ -45,7 +47,7 @@ export default function AdminDashboard() {
     e.preventDefault();
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch("http://localhost:5000/api/jobs", {
+      const res = await fetch("http://localhost:5001/api/jobs", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -63,6 +65,27 @@ export default function AdminDashboard() {
       } else {
         const data = await res.json();
         alert(data.message || "Failed to post job");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchApplications = async (jobId) => {
+    if (viewingJobId === jobId) {
+      setViewingJobId(null);
+      return;
+    }
+
+    setViewingJobId(jobId);
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(`http://localhost:5001/api/applications/job/${jobId}`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setApplications(prev => ({ ...prev, [jobId]: data }));
       }
     } catch (err) {
       console.error(err);
@@ -92,7 +115,7 @@ export default function AdminDashboard() {
       <main className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Post a Job Form */}
-        <div className="lg:col-span-1 glass-card p-6 rounded-2xl shadow-sm border border-gray-100 h-fit">
+        <div className="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-fit">
           <h2 className="text-xl font-poppins font-semibold text-gray-800 mb-4">Post a New Job</h2>
           <form onSubmit={handlePostJob} className="flex flex-col gap-4">
             <div>
@@ -137,34 +160,94 @@ export default function AdminDashboard() {
                 value={formData.requiredSkills} onChange={e => setFormData({...formData, requiredSkills: e.target.value})}
               />
             </div>
-            <button type="submit" className="mt-2 w-full py-2.5 rounded-lg bg-primary hover:bg-emerald-600 text-white font-medium transition-colors">
+            <button type="submit" className="mt-2 w-full py-2.5 rounded-lg bg-gray-900 hover:bg-gray-800 text-white font-medium transition-colors">
               Post Job
             </button>
           </form>
         </div>
 
-        {/* Existing Jobs */}
+        {/* Existing Jobs & Applications */}
         <div className="lg:col-span-2">
-          <h2 className="text-xl font-poppins font-semibold text-gray-800 mb-4">Posted Jobs</h2>
+          <h2 className="text-xl font-poppins font-semibold text-gray-800 mb-4">Posted Jobs & Applicants</h2>
           <div className="flex flex-col gap-4">
             {jobs.map(job => (
-              <div key={job._id} className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex justify-between items-start">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{job.title}</h3>
-                  <p className="text-primary font-medium mb-2">{job.company}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {job.requiredSkills.map(skill => (
-                      <span key={skill} className="px-2 py-1 bg-gray-100 text-gray-700 rounded-md text-xs font-medium">
-                        {skill}
-                      </span>
-                    ))}
+              <div key={job._id} className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">{job.title}</h3>
+                    <p className="text-primary font-medium mb-2">{job.company}</p>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {job.requiredSkills.map(skill => (
+                        <span key={skill} className="px-2 py-1 bg-gray-100 text-gray-700 rounded-md text-xs font-medium">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="inline-block px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-semibold mb-2">
+                      Min CGPA: {job.requiredCgpa}
+                    </span>
+                    <br/>
+                    <button 
+                      onClick={() => fetchApplications(job._id)}
+                      className="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
+                    >
+                      {viewingJobId === job._id ? "Hide Applications" : "View Applications"}
+                    </button>
                   </div>
                 </div>
-                <div className="text-right">
-                  <span className="inline-block px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-semibold">
-                    Min CGPA: {job.requiredCgpa}
-                  </span>
-                </div>
+
+                {/* Applications Section */}
+                {viewingJobId === job._id && (
+                  <div className="mt-4 border-t pt-4">
+                    <h4 className="text-sm font-bold text-gray-700 mb-3">Ranked Applications</h4>
+                    {applications[job._id]?.length > 0 ? (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left text-gray-500">
+                          <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                            <tr>
+                              <th className="px-4 py-2">Candidate</th>
+                              <th className="px-4 py-2">Email</th>
+                              <th className="px-4 py-2">CGPA</th>
+                              <th className="px-4 py-2 text-center">AI Match Score</th>
+                              <th className="px-4 py-2">Resume</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {applications[job._id].map(app => (
+                              <tr key={app._id} className="border-b">
+                                <td className="px-4 py-2 font-medium text-gray-900">{app.user?.name}</td>
+                                <td className="px-4 py-2">{app.user?.email}</td>
+                                <td className="px-4 py-2">{app.user?.cgpa}</td>
+                                <td className="px-4 py-2 text-center">
+                                  <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                                    app.matchScore >= 80 ? 'bg-green-100 text-green-700' :
+                                    app.matchScore >= 50 ? 'bg-yellow-100 text-yellow-700' :
+                                    'bg-red-100 text-red-700'
+                                  }`}>
+                                    {app.matchScore ? `${app.matchScore}%` : 'N/A'}
+                                  </span>
+                                </td>
+                                <td className="px-4 py-2">
+                                  {app.user?.resumeUrl ? (
+                                    <a href={`http://localhost:5001${app.user.resumeUrl}`} target="_blank" rel="noreferrer" className="text-indigo-600 hover:underline">
+                                      View PDF
+                                    </a>
+                                  ) : (
+                                    'No resume'
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500 italic">No applications received yet.</p>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
             {jobs.length === 0 && <p className="text-gray-500 italic">No jobs posted yet.</p>}
