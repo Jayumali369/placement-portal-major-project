@@ -1,0 +1,109 @@
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+
+export default function LoginPage() {
+  const router = useRouter();
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Login failed");
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      if (data.user.role === "admin") router.push("/admin");
+      else router.push("/dashboard");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-950 to-black flex flex-col items-center justify-center p-4">
+      <div className="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] transform transition-all duration-500 hover:scale-[1.02]">
+        <div className="text-center mb-8">
+          <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 mb-2 tracking-tight">
+            Welcome Back
+          </h2>
+          <p className="text-gray-400 text-sm">Sign in to continue your journey</p>
+        </div>
+
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/50 text-red-400 p-4 rounded-xl mb-6 text-sm text-center animate-pulse">
+            {error}
+          </div>
+        )}
+        
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <div className="relative group">
+            <input 
+              type="email" 
+              required
+              id="email"
+              className="w-full px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-transparent focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all peer"
+              placeholder="Email"
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+            />
+            <label 
+              htmlFor="email"
+              className="absolute left-5 top-3 text-gray-400 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3.5 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-indigo-400 peer-focus:bg-gray-900 px-1 rounded"
+            >
+              Email Address
+            </label>
+          </div>
+          
+          <div className="relative group">
+            <input 
+              type="password" 
+              required
+              id="password"
+              className="w-full px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-transparent focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all peer"
+              placeholder="Password"
+              value={formData.password}
+              onChange={(e) => setFormData({...formData, password: e.target.value})}
+            />
+            <label 
+              htmlFor="password"
+              className="absolute left-5 top-3 text-gray-400 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3.5 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-indigo-400 peer-focus:bg-gray-900 px-1 rounded"
+            >
+              Password
+            </label>
+          </div>
+
+          <button 
+            type="submit" 
+            disabled={isLoading}
+            className="mt-2 w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold shadow-lg shadow-indigo-500/30 transform transition-all active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
+          >
+            {isLoading ? "Signing in..." : "Sign In"}
+          </button>
+        </form>
+
+        <p className="mt-8 text-center text-sm text-gray-400">
+          Don't have an account?{" "}
+          <Link href="/signup" className="text-indigo-400 font-medium hover:text-indigo-300 hover:underline transition-colors">
+            Create one now
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}

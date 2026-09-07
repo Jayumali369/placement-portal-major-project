@@ -4,6 +4,7 @@
   "description": "Smart Career Portal with AI Resume Ranking (Major Project BIS785)",
   "main": "index.js",
   "scripts": {
+    "dev": "concurrently \"npm run dev --prefix frontend\" \"npm run dev --prefix backend\" \"cd ai && source venv/bin/activate && uvicorn main:app --reload\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -17,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/kaushal-Prakash/placement-portal-major-project/issues"
   },
-  "homepage": "https://github.com/kaushal-Prakash/placement-portal-major-project#readme"
+  "homepage": "https://github.com/kaushal-Prakash/placement-portal-major-project#readme",
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  }
 }
