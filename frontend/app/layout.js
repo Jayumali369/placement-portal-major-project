@@ -1,5 +1,6 @@
 import { Poppins, Inter } from "next/font/google";
 import "./globals.css";
+import Navbar from "../components/Navbar";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -23,7 +24,12 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${poppins.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans bg-gray-50">
+        <Navbar />
+        <main className="flex-grow">
+          {children}
+        </main>
+      </body>
     </html>
   );
 }

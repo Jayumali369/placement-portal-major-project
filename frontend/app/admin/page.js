@@ -120,30 +120,19 @@ export default function AdminDashboard() {
   if (!user) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <header className="max-w-6xl mx-auto flex justify-between items-center mb-10">
+    <div className="min-h-screen bg-gray-50/50 p-6 sm:p-8">
+      <div className="max-w-6xl mx-auto flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-poppins font-bold text-gray-800">Admin Dashboard</h1>
-          <p className="text-gray-600">Recruiter console for {user.name}</p>
+          <h1 className="text-2xl font-poppins font-bold text-gray-900">Admin Console</h1>
+          <p className="text-gray-600 text-sm">Manage jobs, applications, and scheduling for {user.name}</p>
         </div>
-        <div className="flex gap-4">
-          <button 
-            onClick={() => router.push("/admin/analytics")}
-            className="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors"
-          >
-            📊 View Analytics
-          </button>
-          <button 
-            onClick={() => {
-              localStorage.clear();
-              router.push("/");
-            }}
-            className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors"
-          >
-            Logout
-          </button>
-        </div>
-      </header>
+        <button 
+          onClick={() => router.push("/admin/analytics")}
+          className="px-5 py-2.5 rounded-xl bg-gray-900 text-white font-medium hover:bg-gray-800 transition-all shadow-md hover:shadow-lg flex items-center gap-2"
+        >
+          <span>📊</span> View Analytics
+        </button>
+      </div>
 
       <main className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
         

@@ -120,145 +120,166 @@ export default function StudentDashboard() {
   const appliedJobIds = new Set(myApplications.map(app => app.job?._id));
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <header className="max-w-6xl mx-auto flex justify-between items-center mb-10">
-        <div>
-          <h1 className="text-3xl font-poppins font-bold text-gray-800">Student Dashboard</h1>
-          <p className="text-gray-600">Welcome back, {user.name}!</p>
-        </div>
-        <button 
-          onClick={() => {
-            localStorage.clear();
-            router.push("/");
-          }}
-          className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors"
-        >
-          Logout
-        </button>
-      </header>
-
-      <main className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8">
+    <div className="min-h-screen bg-gray-50/50 p-6 sm:p-8">
+      <main className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8">
         
         {/* Sidebar: Profile & Resume */}
-        <div className="lg:col-span-1">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-6">
-            <h2 className="text-lg font-semibold mb-4">My Profile</h2>
-            <div className="mb-4 text-sm text-gray-600">
-              <p><strong>Email:</strong> {user.email}</p>
-              <p><strong>CGPA:</strong> {user.cgpa || 'N/A'}</p>
+        <div className="lg:col-span-1 space-y-6">
+          <div className="bg-white/70 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-white/50">
+            <h2 className="text-xl font-semibold mb-4 text-gray-900">My Profile</h2>
+            <div className="mb-6 text-sm text-gray-600 space-y-2">
+              <p className="flex justify-between">
+                <span className="font-medium text-gray-500">Email</span>
+                <span className="text-gray-900">{user.email}</span>
+              </p>
+              <p className="flex justify-between">
+                <span className="font-medium text-gray-500">CGPA</span>
+                <span className="text-gray-900 font-medium">{user.cgpa || 'N/A'}</span>
+              </p>
             </div>
 
-            <div className="border-t pt-4">
-              <h3 className="font-medium text-gray-800 mb-2">Resume</h3>
+            <div className="border-t border-gray-100 pt-6">
+              <h3 className="font-medium text-gray-900 mb-3">Resume</h3>
               {user.resumeUrl ? (
-                <div className="mb-4">
-                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
-                    ✓ Resume Uploaded
-                  </span>
-                  <a href={`http://localhost:5001${user.resumeUrl}`} target="_blank" rel="noreferrer" className="block mt-2 text-xs text-primary hover:underline">
-                    View Current Resume
+                <div className="mb-5 bg-green-50/50 border border-green-100 p-3 rounded-xl">
+                  <div className="flex items-center gap-2 text-green-700 text-sm font-medium mb-1">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                    Resume Uploaded
+                  </div>
+                  <a href={`http://localhost:5001${user.resumeUrl}`} target="_blank" rel="noreferrer" className="block text-xs text-primary hover:underline">
+                    View Current Document
                   </a>
                 </div>
               ) : (
-                <p className="text-xs text-orange-600 mb-3">No resume uploaded. Required for applications.</p>
+                <div className="mb-5 bg-orange-50/50 border border-orange-100 p-3 rounded-xl">
+                  <p className="text-xs text-orange-700">No resume uploaded. Required for applications.</p>
+                </div>
               )}
               
-              <form onSubmit={handleUploadResume} className="flex flex-col gap-2">
+              <form onSubmit={handleUploadResume} className="flex flex-col gap-3">
                 <input 
                   type="file" 
                   accept=".pdf,.doc,.docx"
                   onChange={(e) => setResumeFile(e.target.files[0])}
-                  className="text-xs file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:bg-gray-100 file:text-gray-700"
+                  className="text-xs file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 transition-colors w-full cursor-pointer"
                 />
                 <button 
                   type="submit" 
                   disabled={!resumeFile}
-                  className="w-full py-1.5 mt-2 rounded-md bg-gray-900 text-white text-sm disabled:opacity-50"
+                  className="w-full py-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium disabled:opacity-50 transition-colors shadow-md hover:shadow-lg"
                 >
                   Upload Resume
                 </button>
-                {uploadStatus && <p className="text-xs mt-1 text-gray-500">{uploadStatus}</p>}
+                {uploadStatus && <p className="text-xs mt-1 text-center font-medium text-gray-600">{uploadStatus}</p>}
               </form>
             </div>
           </div>
 
           {/* My Applications Widget */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h2 className="text-lg font-semibold mb-4">My Applications</h2>
+          <div className="bg-white/70 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-white/50">
+            <h2 className="text-xl font-semibold mb-4 text-gray-900 flex items-center justify-between">
+              My Applications
+              <span className="text-xs px-2 py-1 bg-gray-100 rounded-lg text-gray-600">{myApplications.length}</span>
+            </h2>
             {myApplications.length > 0 ? (
-              <ul className="space-y-3">
+              <ul className="space-y-4">
                 {myApplications.map(app => (
-                  <li key={app._id} className="text-sm border-b pb-2 last:border-0">
-                    <p className="font-medium text-gray-800">{app.job?.title || 'Unknown Job'}</p>
-                    <div className="flex justify-between items-center mt-1">
-                      <span className="text-gray-500 text-xs">{app.job?.company}</span>
+                  <li key={app._id} className="text-sm p-4 bg-white/50 rounded-2xl border border-gray-100 shadow-sm">
+                    <p className="font-semibold text-gray-900">{app.job?.title || 'Unknown Job'}</p>
+                    <div className="flex justify-between items-center mt-2">
+                      <span className="text-gray-500 text-xs font-medium">{app.job?.company}</span>
                       {app.matchScore !== null && (
-                        <span className="text-xs font-semibold text-primary">Score: {app.matchScore}%</span>
+                        <span className="px-2.5 py-1 bg-primary/10 text-primary rounded-lg text-xs font-bold shadow-sm">
+                          {app.matchScore}% Match
+                        </span>
                       )}
                     </div>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-gray-500">You haven't applied to any jobs yet.</p>
+              <div className="text-center py-6">
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-400 text-xl">
+                  📁
+                </div>
+                <p className="text-sm text-gray-500">You haven't applied to any jobs yet.</p>
+              </div>
             )}
           </div>
         </div>
 
         {/* Main Content: Jobs List */}
         <div className="lg:col-span-3">
-          <h2 className="text-xl font-poppins font-semibold text-gray-800 mb-6">Available Jobs</h2>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-poppins font-bold text-gray-900">Recommended Jobs</h2>
+          </div>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {jobs.map(job => {
               const hasApplied = appliedJobIds.has(job._id);
               const isApplying = applyingJobId === job._id;
 
               return (
-                <div key={job._id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-1">{job.title}</h3>
-                  <div className="flex justify-between items-center mb-3">
-                    <p className="text-primary font-medium">{job.company}</p>
+                <div key={job._id} className="group bg-white/70 backdrop-blur-xl p-6 rounded-3xl shadow-md hover:shadow-xl border border-white/50 transition-all duration-300 hover:-translate-y-1 flex flex-col">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-primary transition-colors">{job.title}</h3>
+                      <p className="text-gray-600 font-medium text-sm">{job.company}</p>
+                    </div>
                     {job.matchScore !== undefined && (
-                      <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
-                        {job.matchScore}% Match
-                      </span>
+                      <div className="flex flex-col items-end">
+                        <span className="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl text-xs font-bold shadow-md">
+                          {job.matchScore}% Match
+                        </span>
+                      </div>
                     )}
                   </div>
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-3">{job.description}</p>
                   
-                  <div className="flex flex-wrap gap-2 mb-6">
+                  <p className="text-gray-600 text-sm mb-6 line-clamp-3 leading-relaxed flex-grow">{job.description}</p>
+                  
+                  <div className="flex flex-wrap gap-2 mb-8">
                     {job.requiredSkills.map(skill => (
-                      <span key={skill} className="px-2 py-1 bg-emerald-50 text-emerald-700 rounded-md text-xs font-medium">
+                      <span key={skill} className="px-3 py-1 bg-gray-100/80 text-gray-700 rounded-lg text-xs font-medium border border-gray-200">
                         {skill}
                       </span>
                     ))}
                   </div>
                   
-                  {hasApplied ? (
-                    <button disabled className="w-full py-2.5 rounded-lg bg-gray-200 text-gray-500 font-medium cursor-not-allowed mb-2">
-                      Applied
-                    </button>
-                  ) : (
+                  <div className="space-y-3 mt-auto">
+                    {hasApplied ? (
+                      <button disabled className="w-full py-3 rounded-xl bg-gray-100 text-gray-400 font-semibold cursor-not-allowed border border-gray-200">
+                        Already Applied
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={() => handleApply(job._id)}
+                        disabled={isApplying}
+                        className="w-full py-3 rounded-xl bg-gray-900 hover:bg-gray-800 text-white font-semibold transition-all shadow-md hover:shadow-lg disabled:opacity-70"
+                      >
+                        {isApplying ? "Submitting Application..." : "Apply for this role"}
+                      </button>
+                    )}
+                    
                     <button 
-                      onClick={() => handleApply(job._id)}
-                      disabled={isApplying}
-                      className="w-full py-2.5 rounded-lg bg-gray-900 hover:bg-gray-800 text-white font-medium transition-colors disabled:opacity-70 mb-2"
+                      onClick={() => router.push(`/dashboard/mock-interview/${job._id}`)}
+                      className="w-full py-3 rounded-xl bg-primary/5 hover:bg-primary/10 border-2 border-primary/20 text-primary font-semibold transition-all flex items-center justify-center gap-2"
                     >
-                      {isApplying ? "Applying..." : "Apply Now"}
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                      Practice Mock Interview
                     </button>
-                  )}
-                  
-                  <button 
-                    onClick={() => router.push(`/dashboard/mock-interview/${job._id}`)}
-                    className="w-full py-2.5 rounded-lg border-2 border-primary text-primary font-medium hover:bg-primary/5 transition-colors flex items-center justify-center gap-2"
-                  >
-                    🤖 Practice Mock Interview
-                  </button>
+                  </div>
                 </div>
               );
             })}
+            
             {jobs.length === 0 && (
-              <p className="text-gray-500 italic col-span-2">No jobs posted yet.</p>
+              <div className="col-span-2 py-12 text-center bg-white/50 backdrop-blur-md rounded-3xl border border-white/50">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400 text-2xl">
+                  🔍
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">No jobs available right now</h3>
+                <p className="text-gray-500">Check back later for new opportunities matching your profile.</p>
+              </div>
             )}
           </div>
         </div>
