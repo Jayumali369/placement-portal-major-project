@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+onnxruntime
+numpy
+pydantic
+PyMuPDF
+transformers
+huggingface-hub
+python-multipart
+langchain
+langchain-google-genai
