@@ -32,8 +32,8 @@ export default function StudentDashboard() {
 
   const fetchData = async (token) => {
     try {
-      // Fetch available jobs
-      const jobsRes = await fetch("http://localhost:5001/api/jobs", {
+      // Fetch available jobs (Smart Feed)
+      const jobsRes = await fetch("http://localhost:5001/api/jobs/smart-feed", {
         headers: { "Authorization": `Bearer ${token}` }
       });
       const jobsData = await jobsRes.json();
@@ -216,7 +216,14 @@ export default function StudentDashboard() {
               return (
                 <div key={job._id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                   <h3 className="text-xl font-semibold text-gray-900 mb-1">{job.title}</h3>
-                  <p className="text-primary font-medium mb-3">{job.company}</p>
+                  <div className="flex justify-between items-center mb-3">
+                    <p className="text-primary font-medium">{job.company}</p>
+                    {job.matchScore !== undefined && (
+                      <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
+                        {job.matchScore}% Match
+                      </span>
+                    )}
+                  </div>
                   <p className="text-gray-600 text-sm mb-4 line-clamp-3">{job.description}</p>
                   
                   <div className="flex flex-wrap gap-2 mb-6">
@@ -228,18 +235,25 @@ export default function StudentDashboard() {
                   </div>
                   
                   {hasApplied ? (
-                    <button disabled className="w-full py-2.5 rounded-lg bg-gray-200 text-gray-500 font-medium cursor-not-allowed">
+                    <button disabled className="w-full py-2.5 rounded-lg bg-gray-200 text-gray-500 font-medium cursor-not-allowed mb-2">
                       Applied
                     </button>
                   ) : (
                     <button 
                       onClick={() => handleApply(job._id)}
                       disabled={isApplying}
-                      className="w-full py-2.5 rounded-lg bg-gray-900 hover:bg-gray-800 text-white font-medium transition-colors disabled:opacity-70"
+                      className="w-full py-2.5 rounded-lg bg-gray-900 hover:bg-gray-800 text-white font-medium transition-colors disabled:opacity-70 mb-2"
                     >
                       {isApplying ? "Applying..." : "Apply Now"}
                     </button>
                   )}
+                  
+                  <button 
+                    onClick={() => router.push(`/dashboard/mock-interview/${job._id}`)}
+                    className="w-full py-2.5 rounded-lg border-2 border-primary text-primary font-medium hover:bg-primary/5 transition-colors flex items-center justify-center gap-2"
+                  >
+                    🤖 Practice Mock Interview
+                  </button>
                 </div>
               );
             })}

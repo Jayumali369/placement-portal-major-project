@@ -88,6 +88,27 @@ def calculate_match(request: MatchRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+class BulkMatchRequest(BaseModel):
+    resume_text: str
+    job_descriptions: list[str]
+
+@app.post("/api/bulk-match")
+def calculate_bulk_match(request: BulkMatchRequest):
+    try:
+        resume_emb = get_embedding(request.resume_text)
+        scores = []
+        for jd in request.job_descriptions:
+            jd_emb = get_embedding(jd)
+            similarity = cosine_similarity(resume_emb, jd_emb)
+            scores.append(round(similarity * 100, 2))
+        
+        return {
+            "match_scores": scores,
+            "details": "Calculated using local ONNX model (all-MiniLM-L6-v2)"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/api/parse-pdf")
 async def parse_pdf(file: UploadFile = File(...)):
     if not file.filename.endswith(".pdf"):
@@ -103,6 +124,62 @@ async def parse_pdf(file: UploadFile = File(...)):
         return {"parsed_text": text.strip()}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to parse PDF: {str(e)}")
+
+class MockInterviewRequest(BaseModel):
+    resume_text: str
+    job_description: str
+    historical_questions: list[str]
+    chat_history: list[dict] = [] # e.g. [{"role": "user", "content": "..."}, ...]
+
+@app.post("/api/copilot/mock-interview")
+async def mock_interview(request: MockInterviewRequest):
+    try:
+        from langchain_google_genai import ChatGoogleGenerativeAI
+        from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
+
+        # Requires GOOGLE_API_KEY environment variable to be set
+        # But we will handle if it's missing gracefully
+        api_key = os.environ.get("GOOGLE_API_KEY")
+        if not api_key:
+            return {"reply": "Sorry, the GOOGLE_API_KEY is not configured on the AI server."}
+
+        llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro", google_api_key=api_key)
+
+        system_prompt = f"""You are an expert technical interviewer acting as a hiring manager.
+You are interviewing a candidate for a role described as:
+{request.job_description}
+
+Here is the candidate's resume:
+{request.resume_text}
+
+Here are some questions previously asked by this company to other candidates:
+{chr(10).join(request.historical_questions)}
+
+Instructions:
+1. Conduct a mock interview.
+2. Ask one question at a time. Do not overwhelm the candidate.
+3. Base your questions on their resume gaps relative to the job description, AND draw heavily from the historical questions.
+4. Keep the tone professional but encouraging.
+5. If the candidate answers, briefly evaluate their answer and ask the next question.
+"""
+        messages = [SystemMessage(content=system_prompt)]
+        
+        for msg in request.chat_history:
+            if msg["role"] == "user":
+                messages.append(HumanMessage(content=msg["content"]))
+            elif msg["role"] == "assistant":
+                messages.append(AIMessage(content=msg["content"]))
+
+        # If there's no chat history, start the interview
+        if not request.chat_history:
+            messages.append(HumanMessage(content="Hello, I am ready to start the interview."))
+
+        response = llm.invoke(messages)
+        return {"reply": response.content}
+
+    except Exception as e:
+        print(f"LLM Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn

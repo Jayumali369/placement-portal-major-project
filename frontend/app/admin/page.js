@@ -92,6 +92,31 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleSchedule = async (jobId, date, time) => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(`http://localhost:5001/api/interviews/schedule/${jobId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ startDate: date, startTime: time })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message);
+        // Refresh applications to see status change
+        fetchApplications(jobId);
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error scheduling interviews");
+    }
+  };
+
   if (!user) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
 
   return (
@@ -101,15 +126,23 @@ export default function AdminDashboard() {
           <h1 className="text-3xl font-poppins font-bold text-gray-800">Admin Dashboard</h1>
           <p className="text-gray-600">Recruiter console for {user.name}</p>
         </div>
-        <button 
-          onClick={() => {
-            localStorage.clear();
-            router.push("/");
-          }}
-          className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors"
-        >
-          Logout
-        </button>
+        <div className="flex gap-4">
+          <button 
+            onClick={() => router.push("/admin/analytics")}
+            className="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors"
+          >
+            📊 View Analytics
+          </button>
+          <button 
+            onClick={() => {
+              localStorage.clear();
+              router.push("/");
+            }}
+            className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors"
+          >
+            Logout
+          </button>
+        </div>
       </header>
 
       <main className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -201,7 +234,23 @@ export default function AdminDashboard() {
                 {/* Applications Section */}
                 {viewingJobId === job._id && (
                   <div className="mt-4 border-t pt-4">
-                    <h4 className="text-sm font-bold text-gray-700 mb-3">Ranked Applications</h4>
+                    <div className="flex justify-between items-center mb-3">
+                      <h4 className="text-sm font-bold text-gray-700">Ranked Applications</h4>
+                      <div className="flex gap-2 text-sm items-center">
+                        <input type="date" id={`date-${job._id}`} className="border px-2 py-1 rounded" defaultValue={new Date().toISOString().split('T')[0]}/>
+                        <input type="time" id={`time-${job._id}`} className="border px-2 py-1 rounded" defaultValue="09:00"/>
+                        <button 
+                          onClick={() => {
+                            const date = document.getElementById(`date-${job._id}`).value;
+                            const time = document.getElementById(`time-${job._id}`).value;
+                            handleSchedule(job._id, date, time);
+                          }}
+                          className="px-3 py-1 bg-primary text-white rounded font-medium hover:bg-primary/90"
+                        >
+                          Auto-Schedule
+                        </button>
+                      </div>
+                    </div>
                     {applications[job._id]?.length > 0 ? (
                       <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left text-gray-500">
@@ -211,6 +260,7 @@ export default function AdminDashboard() {
                               <th className="px-4 py-2">Email</th>
                               <th className="px-4 py-2">CGPA</th>
                               <th className="px-4 py-2 text-center">AI Match Score</th>
+                              <th className="px-4 py-2">Status</th>
                               <th className="px-4 py-2">Resume</th>
                             </tr>
                           </thead>
@@ -228,6 +278,9 @@ export default function AdminDashboard() {
                                   }`}>
                                     {app.matchScore ? `${app.matchScore}%` : 'N/A'}
                                   </span>
+                                </td>
+                                <td className="px-4 py-2 font-semibold">
+                                  {app.status}
                                 </td>
                                 <td className="px-4 py-2">
                                   {app.user?.resumeUrl ? (

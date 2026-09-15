@@ -7,12 +7,84 @@ const router = express.Router();
 // GET all jobs (public/student)
 router.get('/', async (req, res) => {
   try {
-    const jobs = await Job.find({}).sort({ createdAt: -1 });
+    const jobs = await Job.find({ status: 'open' }).sort({ createdAt: -1 });
     res.json(jobs);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
+
+// GET smart feed jobs sorted by match score
+router.get('/smart-feed', protect, async (req, res) => {
+  try {
+    const jobs = await Job.find({ status: 'open' }).lean(); // Use lean to add matchScore later
+
+    // Ensure we fetch the user's resumeUrl
+    const User = (await import('../models/User.js')).default;
+    const user = await User.findById(req.user.id);
+    
+    if (!user || !user.resumeUrl) {
+      // Fallback to normal if no resume uploaded
+      return res.json(jobs.sort((a, b) => b.createdAt - a.createdAt));
+    }
+
+    const fs = await import('fs');
+    const path = await import('path');
+    const fetch = (await import('node-fetch')).default;
+    const FormData = (await import('form-data')).default;
+
+    const filePath = path.join(process.cwd(), user.resumeUrl);
+    const formData = new FormData();
+    formData.append('file', fs.createReadStream(filePath));
+
+    // 1. Parse PDF
+    const parseRes = await fetch('http://localhost:8000/api/parse-pdf', {
+      method: 'POST',
+      body: formData,
+    });
+    
+    if (!parseRes.ok) {
+       return res.json(jobs.sort((a, b) => b.createdAt - a.createdAt));
+    }
+    
+    const parseData = await parseRes.json();
+    const resumeText = parseData.parsed_text;
+
+    // 2. Bulk Match
+    const jobDescriptions = jobs.map(j => j.description + ' ' + (j.requiredSkills || []).join(' '));
+    const matchReq = await fetch('http://localhost:8000/api/bulk-match', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        resume_text: resumeText,
+        job_descriptions: jobDescriptions
+      })
+    });
+
+    if (!matchReq.ok) {
+       return res.json(jobs.sort((a, b) => b.createdAt - a.createdAt));
+    }
+
+    const matchData = await matchReq.json();
+    const scores = matchData.match_scores;
+
+    // Attach scores to jobs and sort
+    const scoredJobs = jobs.map((job, index) => ({
+      ...job,
+      matchScore: scores[index]
+    }));
+
+    scoredJobs.sort((a, b) => b.matchScore - a.matchScore);
+    res.json(scoredJobs);
+
+  } catch (error) {
+    console.error('Smart feed error:', error);
+    // Fallback to basic list on error
+    const fallbackJobs = await Job.find({ status: 'open' }).sort({ createdAt: -1 });
+    res.json(fallbackJobs);
+  }
+});
+
 
 // POST a new job (admin only)
 router.post('/', protect, adminOnly, async (req, res) => {

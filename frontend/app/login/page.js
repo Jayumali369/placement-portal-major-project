@@ -52,40 +52,30 @@ export default function LoginPage() {
         )}
         
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-          <div className="relative group">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="email" className="text-sm font-medium text-gray-300 pl-1">Email Address</label>
             <input 
               type="email" 
               required
               id="email"
-              className="w-full px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-transparent focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all peer"
-              placeholder="Email"
+              className="w-full px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+              placeholder="you@example.com"
               value={formData.email}
               onChange={(e) => setFormData({...formData, email: e.target.value})}
             />
-            <label 
-              htmlFor="email"
-              className="absolute left-5 top-3 text-gray-400 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3.5 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-indigo-400 peer-focus:bg-gray-900 px-1 rounded"
-            >
-              Email Address
-            </label>
           </div>
           
-          <div className="relative group">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="password" className="text-sm font-medium text-gray-300 pl-1">Password</label>
             <input 
               type="password" 
               required
               id="password"
-              className="w-full px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-transparent focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all peer"
-              placeholder="Password"
+              className="w-full px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+              placeholder="••••••••"
               value={formData.password}
               onChange={(e) => setFormData({...formData, password: e.target.value})}
             />
-            <label 
-              htmlFor="password"
-              className="absolute left-5 top-3 text-gray-400 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3.5 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-indigo-400 peer-focus:bg-gray-900 px-1 rounded"
-            >
-              Password
-            </label>
           </div>
 
           <button 

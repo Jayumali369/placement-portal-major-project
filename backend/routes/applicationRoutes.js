@@ -7,6 +7,7 @@ import Application from '../models/Application.js';
 import Job from '../models/Job.js';
 import User from '../models/User.js';
 import { protect, adminOnly } from '../middleware/authMiddleware.js';
+import { evaluateApplicationRules } from '../utils/rulesEngine.js';
 
 const router = express.Router();
 
@@ -39,8 +40,15 @@ router.post('/:jobId', protect, async (req, res) => {
       return res.status(400).json({ message: 'Please upload a resume first' });
     }
 
+    // Evaluate against campus policies
+    const ruleEvaluation = evaluateApplicationRules(user, job);
+    if (!ruleEvaluation.allowed) {
+      return res.status(403).json({ message: ruleEvaluation.reason });
+    }
+
     // 3. Connect to AI Microservice for parsing and matching
     let matchScore = null;
+
     let aiFeedback = "AI matching failed.";
 
     try {
@@ -125,6 +133,37 @@ router.get('/my', protect, async (req, res) => {
     const applications = await Application.find({ user: req.user.id })
       .populate('job', 'title company');
     res.json(applications);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+/**
+ * @route PUT /api/applications/:id/status
+ * @desc Update application status
+ * @access Private (Admin only)
+ */
+router.put('/:id/status', protect, adminOnly, async (req, res) => {
+  try {
+    const { status } = req.body;
+    const application = await Application.findById(req.params.id);
+
+    if (!application) {
+      return res.status(404).json({ message: 'Application not found' });
+    }
+
+    application.status = status;
+    await application.save();
+
+    // If placed, update user's isPlaced status
+    if (status === 'placed') {
+      const user = await User.findById(application.user);
+      user.isPlaced = true;
+      user.placedJob = application.job;
+      await user.save();
+    }
+
+    res.json(application);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
