@@ -3,7 +3,7 @@ import Job from '../models/Job.js';
 import User from '../models/User.js';
 import Application from '../models/Application.js';
 import InterviewSlot from '../models/InterviewSlot.js';
-import { protect, admin } from '../middleware/authMiddleware.js';
+import { protect, adminOnly } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -12,7 +12,7 @@ const router = express.Router();
  * @desc Auto-schedule interviews for a specific job for all 'Shortlisted' candidates
  * @access Private/Admin
  */
-router.post('/schedule/:jobId', protect, admin, async (req, res) => {
+router.post('/schedule/:jobId', protect, adminOnly, async (req, res) => {
   try {
     const { jobId } = req.params;
     const { startDate, startTime, interviewDurationMinutes = 30, breaksBetweenMinutes = 5 } = req.body;
@@ -70,7 +70,7 @@ router.post('/schedule/:jobId', protect, admin, async (req, res) => {
  * @desc Get all interview slots for a job
  * @access Private/Admin
  */
-router.get('/:jobId', protect, admin, async (req, res) => {
+router.get('/:jobId', protect, adminOnly, async (req, res) => {
   try {
     const slots = await InterviewSlot.find({ job: req.params.jobId }).populate('candidate', 'name email');
     res.json(slots);

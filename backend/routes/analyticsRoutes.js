@@ -2,7 +2,7 @@ import express from 'express';
 import User from '../models/User.js';
 import Job from '../models/Job.js';
 import Application from '../models/Application.js';
-import { protect, admin } from '../middleware/authMiddleware.js';
+import { protect, adminOnly } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -11,7 +11,7 @@ const router = express.Router();
  * @desc Get placement analytics data
  * @access Private/Admin
  */
-router.get('/', protect, admin, async (req, res) => {
+router.get('/', protect, adminOnly, async (req, res) => {
   try {
     const totalStudents = await User.countDocuments({ role: 'student' });
     const placedStudents = await User.countDocuments({ role: 'student', isPlaced: true });
