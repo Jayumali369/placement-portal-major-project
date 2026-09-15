@@ -8,6 +8,7 @@ export default function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isAdminMode, setIsAdminMode] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,9 +41,11 @@ export default function LoginPage() {
       <div className="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] transform transition-all duration-500 hover:scale-[1.02]">
         <div className="text-center mb-8">
           <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 mb-2 tracking-tight">
-            Welcome Back
+            {isAdminMode ? "Admin Portal" : "Welcome Back"}
           </h2>
-          <p className="text-gray-400 text-sm">Sign in to continue your journey</p>
+          <p className="text-gray-400 text-sm">
+            {isAdminMode ? "Sign in to manage the placement platform" : "Sign in to continue your journey"}
+          </p>
         </div>
 
         {error && (
@@ -81,18 +84,45 @@ export default function LoginPage() {
           <button 
             type="submit" 
             disabled={isLoading}
-            className="mt-2 w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold shadow-lg shadow-indigo-500/30 transform transition-all active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
+            className={`mt-2 w-full py-3.5 rounded-xl font-semibold text-white shadow-lg transform transition-all active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed ${
+              isAdminMode 
+                ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-emerald-500/30" 
+                : "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 shadow-indigo-500/30"
+            }`}
           >
-            {isLoading ? "Signing in..." : "Sign In"}
+            {isLoading ? "Signing in..." : (isAdminMode ? "Sign In as Admin" : "Sign In")}
           </button>
         </form>
 
-        <p className="mt-8 text-center text-sm text-gray-400">
-          Don't have an account?{" "}
-          <Link href="/signup" className="text-indigo-400 font-medium hover:text-indigo-300 hover:underline transition-colors">
-            Create one now
-          </Link>
-        </p>
+        <div className="mt-8 pt-6 border-t border-white/10 text-center">
+          {isAdminMode ? (
+            <p className="text-sm text-gray-400">
+              Are you a student?{" "}
+              <button 
+                type="button" 
+                onClick={() => setIsAdminMode(false)}
+                className="text-indigo-400 font-medium hover:text-indigo-300 transition-colors"
+              >
+                Student Login
+              </button>
+            </p>
+          ) : (
+            <p className="text-sm text-gray-400">
+              Administrator?{" "}
+              <button 
+                type="button" 
+                onClick={() => {
+                  setIsAdminMode(true);
+                  // Optionally prefill for demo convenience
+                  setFormData({ email: "admin", password: "admin" });
+                }}
+                className="text-emerald-400 font-medium hover:text-emerald-300 transition-colors"
+              >
+                Admin Login
+              </button>
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -9,11 +9,13 @@ const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretjwtkey';
 
 /**
- * @route POST /api/auth/register
- * @desc Register a new user
- * @access Public
+ * @route POST /api/auth/admin/users
+ * @desc Create a new user (Student or Admin) - Admin Only
+ * @access Private/Admin
  */
-router.post('/register', async (req, res) => {
+import { protect, adminOnly } from '../middleware/authMiddleware.js';
+
+router.post('/admin/users', protect, adminOnly, async (req, res) => {
   try {
     const { name, email, password, role, cgpa } = req.body;
     
@@ -25,16 +27,19 @@ router.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     
     // Create new user document
-    const newUser = new User({ name, email, password: hashedPassword, role, cgpa });
+    const newUser = new User({ 
+      name, 
+      email, 
+      password: hashedPassword, 
+      role: role || 'student', 
+      cgpa 
+    });
     
     // Save the user to the database
     await newUser.save();
 
-    // Generate JWT token for immediate login after registration
-    const token = jwt.sign({ id: newUser._id, role: newUser.role }, JWT_SECRET, { expiresIn: '1d' });
-    
-    // Return the token and user data
-    res.status(201).json({ token, user: { id: newUser._id, name, email, role } });
+    // Do NOT return a JWT token since the admin is the one creating it, just return success
+    res.status(201).json({ message: 'User created successfully', user: { id: newUser._id, name, email, role: newUser.role } });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
