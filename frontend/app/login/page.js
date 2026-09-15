@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { motion } from "framer-motion";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -37,31 +37,49 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-950 to-black flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] transform transition-all duration-500 hover:scale-[1.02]">
+    <div className="min-h-screen bg-[#f7f2eb] relative overflow-hidden flex flex-col items-center justify-center p-4 font-sans text-[#333333]">
+      
+      {/* Animated Background Blobs matching Home Page */}
+      <motion.div 
+        animate={{ scale: [1, 1.1, 1], rotate: [0, 90, 0] }}
+        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+        className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-[#8b9a6e]/20 rounded-full blur-[100px] mix-blend-multiply opacity-70 z-0"
+      />
+      <motion.div 
+        animate={{ scale: [1, 1.2, 1], rotate: [0, -90, 0] }}
+        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+        className="absolute top-[20%] right-[-10%] w-[35vw] h-[35vw] bg-[#eae2d6]/60 rounded-full blur-[100px] mix-blend-multiply opacity-70 z-0"
+      />
+      
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md bg-white/50 backdrop-blur-xl border border-white/60 p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transform transition-all relative z-10"
+      >
         <div className="text-center mb-8">
-          <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 mb-2 tracking-tight">
+          <h2 className="text-4xl font-extrabold text-[#333333] mb-2 tracking-tight font-poppins">
             {isAdminMode ? "Admin Portal" : "Welcome Back"}
           </h2>
-          <p className="text-gray-400 text-sm">
+          <p className="text-gray-600 text-sm">
             {isAdminMode ? "Sign in to manage the placement platform" : "Sign in to continue your journey"}
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/50 text-red-400 p-4 rounded-xl mb-6 text-sm text-center animate-pulse">
+          <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl mb-6 text-sm text-center animate-pulse">
             {error}
           </div>
         )}
         
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="email" className="text-sm font-medium text-gray-300 pl-1">Email Address</label>
+            <label htmlFor="email" className="text-sm font-medium text-gray-700 pl-1">Email Address</label>
             <input 
               type="email" 
               required
               id="email"
-              className="w-full px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+              className="w-full px-5 py-3 rounded-xl bg-white/80 border border-gray-200 text-[#333333] placeholder-gray-400 focus:ring-2 focus:ring-[#8b9a6e] focus:border-transparent outline-none transition-all"
               placeholder="you@example.com"
               value={formData.email}
               onChange={(e) => setFormData({...formData, email: e.target.value})}
@@ -69,12 +87,12 @@ export default function LoginPage() {
           </div>
           
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="password" className="text-sm font-medium text-gray-300 pl-1">Password</label>
+            <label htmlFor="password" className="text-sm font-medium text-gray-700 pl-1">Password</label>
             <input 
               type="password" 
               required
               id="password"
-              className="w-full px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+              className="w-full px-5 py-3 rounded-xl bg-white/80 border border-gray-200 text-[#333333] placeholder-gray-400 focus:ring-2 focus:ring-[#8b9a6e] focus:border-transparent outline-none transition-all"
               placeholder="••••••••"
               value={formData.password}
               onChange={(e) => setFormData({...formData, password: e.target.value})}
@@ -86,44 +104,43 @@ export default function LoginPage() {
             disabled={isLoading}
             className={`mt-2 w-full py-3.5 rounded-xl font-semibold text-white shadow-lg transform transition-all active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed ${
               isAdminMode 
-                ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-emerald-500/30" 
-                : "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 shadow-indigo-500/30"
+                ? "bg-[#333333] hover:bg-[#1a1a1a] shadow-[#333333]/20" 
+                : "bg-[#8b9a6e] hover:bg-[#7b8a5e] shadow-[#8b9a6e]/30"
             }`}
           >
             {isLoading ? "Signing in..." : (isAdminMode ? "Sign In as Admin" : "Sign In")}
           </button>
         </form>
 
-        <div className="mt-8 pt-6 border-t border-white/10 text-center">
+        <div className="mt-8 pt-6 border-t border-gray-200/60 text-center">
           {isAdminMode ? (
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-600">
               Are you a student?{" "}
               <button 
                 type="button" 
                 onClick={() => setIsAdminMode(false)}
-                className="text-indigo-400 font-medium hover:text-indigo-300 transition-colors"
+                className="text-[#8b9a6e] font-semibold hover:text-[#7b8a5e] transition-colors"
               >
                 Student Login
               </button>
             </p>
           ) : (
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-600">
               Administrator?{" "}
               <button 
                 type="button" 
                 onClick={() => {
                   setIsAdminMode(true);
-                  // Optionally prefill for demo convenience
                   setFormData({ email: "admin", password: "admin" });
                 }}
-                className="text-emerald-400 font-medium hover:text-emerald-300 transition-colors"
+                className="text-[#333333] font-semibold hover:text-black transition-colors"
               >
                 Admin Login
               </button>
             </p>
           )}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
