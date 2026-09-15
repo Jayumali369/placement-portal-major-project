@@ -10,21 +10,24 @@ const seedAdmin = async () => {
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/placement_portal');
     
     const existingAdmin = await User.findOne({ email: 'admin' });
-    if (existingAdmin) {
-      console.log('Admin already exists');
-      process.exit(0);
+    // Delete old admin if exists
+    await User.findOneAndDelete({ email: "admin" });
+
+    // Check if new admin exists
+    const adminExists = await User.findOne({ email: "admin@gmail.com" });
+    if (!adminExists) {
+      const hashedPassword = await bcrypt.hash("admin", 10);
+      const adminUser = new User({
+        name: "Admin",
+        email: "admin@gmail.com",
+        password: hashedPassword,
+        role: "admin",
+      });
+      await adminUser.save();
+      console.log("Admin user seeded successfully with email admin@gmail.com.");
+    } else {
+      console.log("Admin user already exists.");
     }
-
-    const hashedPassword = await bcrypt.hash('admin', 10);
-    const admin = new User({
-      name: 'System Admin',
-      email: 'admin',
-      password: hashedPassword,
-      role: 'admin'
-    });
-
-    await admin.save();
-    console.log('Default admin created successfully (username: admin, password: admin)');
     process.exit(0);
   } catch (err) {
     console.error('Error creating admin:', err);

@@ -131,7 +131,7 @@ export default function LoginPage() {
                 type="button" 
                 onClick={() => {
                   setIsAdminMode(true);
-                  setFormData({ email: "admin", password: "admin" });
+                  setFormData({ email: "admin@gmail.com", password: "admin" });
                 }}
                 className="text-[#333333] font-semibold hover:text-black transition-colors"
               >
