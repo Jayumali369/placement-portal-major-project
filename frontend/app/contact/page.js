@@ -1,6 +1,20 @@
 "use client";
 
 import { MapPin, Mail, Phone, Send } from "lucide-react";
+import { motion } from "framer-motion";
+
+const fadeInUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.2 }
+  }
+};
 
 export default function ContactPage() {
   const handleSubmit = (e) => {
@@ -12,22 +26,35 @@ export default function ContactPage() {
     <div className="min-h-screen bg-[#f7f2eb] flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       
       {/* Decorative Background Elements */}
-      <div className="absolute top-[-10%] right-[-5%] w-[40vw] h-[40vw] bg-[#8b9a6e]/10 rounded-full blur-[100px] pointer-events-none"></div>
-      <div className="absolute bottom-[-10%] left-[-5%] w-[35vw] h-[35vw] bg-[#eae2d6]/40 rounded-full blur-[100px] pointer-events-none"></div>
+      <motion.div 
+        animate={{ scale: [1, 1.1, 1], rotate: [0, 90, 0] }}
+        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+        className="absolute top-[-10%] right-[-5%] w-[40vw] h-[40vw] bg-[#8b9a6e]/10 rounded-full blur-[100px] pointer-events-none"
+      />
+      <motion.div 
+        animate={{ scale: [1, 1.2, 1], rotate: [0, -90, 0] }}
+        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+        className="absolute bottom-[-10%] left-[-5%] w-[35vw] h-[35vw] bg-[#eae2d6]/40 rounded-full blur-[100px] pointer-events-none"
+      />
 
       <div className="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 gap-12 relative z-10">
         
         {/* Contact Info */}
-        <div className="flex flex-col justify-center">
-          <h1 className="text-4xl font-poppins font-extrabold text-[#333333] sm:text-5xl mb-6">
+        <motion.div 
+          initial="hidden"
+          animate="visible"
+          variants={staggerContainer}
+          className="flex flex-col justify-center"
+        >
+          <motion.h1 variants={fadeInUp} className="text-4xl font-poppins font-extrabold text-[#333333] sm:text-5xl mb-6">
             Get in Touch
-          </h1>
-          <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+          </motion.h1>
+          <motion.p variants={fadeInUp} className="text-lg text-gray-600 mb-8 leading-relaxed">
             Have questions about SmartCareer? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
-          </p>
+          </motion.p>
           
           <div className="space-y-6">
-            <div className="flex items-center gap-5 group">
+            <motion.div variants={fadeInUp} className="flex items-center gap-5 group">
               <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-[#8b9a6e] border border-gray-100 group-hover:scale-110 group-hover:shadow-md transition-all">
                 <MapPin className="w-6 h-6" />
               </div>
@@ -35,9 +62,9 @@ export default function ContactPage() {
                 <h3 className="font-semibold text-gray-900 text-lg">Office</h3>
                 <p className="text-gray-600">123 Innovation Drive, Tech City, TC 90210</p>
               </div>
-            </div>
+            </motion.div>
             
-            <div className="flex items-center gap-5 group">
+            <motion.div variants={fadeInUp} className="flex items-center gap-5 group">
               <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-[#8b9a6e] border border-gray-100 group-hover:scale-110 group-hover:shadow-md transition-all">
                 <Mail className="w-6 h-6" />
               </div>
@@ -45,9 +72,9 @@ export default function ContactPage() {
                 <h3 className="font-semibold text-gray-900 text-lg">Email</h3>
                 <p className="text-gray-600">support@smartcareer.demo</p>
               </div>
-            </div>
+            </motion.div>
             
-            <div className="flex items-center gap-5 group">
+            <motion.div variants={fadeInUp} className="flex items-center gap-5 group">
               <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-[#8b9a6e] border border-gray-100 group-hover:scale-110 group-hover:shadow-md transition-all">
                 <Phone className="w-6 h-6" />
               </div>
@@ -55,12 +82,17 @@ export default function ContactPage() {
                 <h3 className="font-semibold text-gray-900 text-lg">Phone</h3>
                 <p className="text-gray-600">+1 (555) 123-4567</p>
               </div>
-            </div>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Contact Form */}
-        <div className="bg-white/60 backdrop-blur-xl p-8 sm:p-10 rounded-3xl shadow-xl border border-white/60">
+        <motion.div 
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.7, delay: 0.3 }}
+          className="bg-white/60 backdrop-blur-xl p-8 sm:p-10 rounded-3xl shadow-xl border border-white/60"
+        >
           <h2 className="text-2xl font-semibold text-[#333333] mb-6 font-poppins">Send a Message</h2>
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
@@ -115,7 +147,7 @@ export default function ContactPage() {
               <Send className="w-4 h-4" />
             </button>
           </form>
-        </div>
+        </motion.div>
         
       </div>
     </div>
