@@ -28,6 +28,7 @@ export default function StudentDashboard() {
     
     setUser(parsedUser);
     fetchData(token);
+    checkAndUploadPendingResume(token, parsedUser);
   }, []);
 
   const fetchData = async (token) => {
@@ -47,6 +48,49 @@ export default function StudentDashboard() {
       if (appsRes.ok) setMyApplications(appsData);
     } catch (err) {
       console.error("Error fetching data:", err);
+    }
+  };
+
+  const checkAndUploadPendingResume = async (token, currentUser) => {
+    const pendingData = sessionStorage.getItem("pendingResumeData");
+    const pendingName = sessionStorage.getItem("pendingResumeName");
+    
+    if (pendingData && pendingName) {
+      setUploadStatus("Processing uploaded resume...");
+      // Remove from session storage immediately to prevent duplicate uploads
+      sessionStorage.removeItem("pendingResumeData");
+      sessionStorage.removeItem("pendingResumeName");
+      
+      try {
+        // Convert Data URL back to a File object
+        const res = await fetch(pendingData);
+        const blob = await res.blob();
+        const file = new File([blob], pendingName, { type: blob.type });
+        
+        const formData = new FormData();
+        formData.append("resume", file);
+        
+        const uploadRes = await fetch("http://localhost:5001/api/upload/resume", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          },
+          body: formData
+        });
+        
+        const data = await uploadRes.json();
+        if (uploadRes.ok) {
+          setUploadStatus("Resume auto-uploaded successfully!");
+          const updatedUser = { ...currentUser, resumeUrl: data.filePath };
+          setUser(updatedUser);
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+        } else {
+          setUploadStatus(data.message || "Failed to auto-upload resume");
+        }
+      } catch (err) {
+        console.error("Error auto-uploading:", err);
+        setUploadStatus("Error auto-uploading resume.");
+      }
     }
   };
 
