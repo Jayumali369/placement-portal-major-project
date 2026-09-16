@@ -11,26 +11,6 @@ export default function StudentDashboard() {
   const [myApplications, setMyApplications] = useState([]);
   const [applyingJobId, setApplyingJobId] = useState(null);
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
-    
-    if (!token || !storedUser) {
-      router.push("/login");
-      return;
-    }
-
-    const parsedUser = JSON.parse(storedUser);
-    if (parsedUser.role !== "student") {
-      router.push("/admin");
-      return;
-    }
-    
-    setUser(parsedUser);
-    fetchData(token);
-    checkAndUploadPendingResume(token, parsedUser);
-  }, []);
-
   const fetchData = async (token) => {
     try {
       // Fetch available jobs (Smart Feed)
@@ -93,6 +73,28 @@ export default function StudentDashboard() {
       }
     }
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("user");
+    
+    if (!token || !storedUser) {
+      router.push("/login");
+      return;
+    }
+
+    const parsedUser = JSON.parse(storedUser);
+    if (parsedUser.role !== "student") {
+      router.push("/admin");
+      return;
+    }
+    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setUser(parsedUser);
+    fetchData(token);
+    checkAndUploadPendingResume(token, parsedUser);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleUploadResume = async (e) => {
     e.preventDefault();

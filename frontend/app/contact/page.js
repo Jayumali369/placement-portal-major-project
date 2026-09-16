@@ -50,7 +50,7 @@ export default function ContactPage() {
             Get in Touch
           </motion.h1>
           <motion.p variants={fadeInUp} className="text-lg text-gray-600 mb-8 leading-relaxed">
-            Have questions about SmartCareer? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+            Have questions about SmartCareer? We&apos;d love to hear from you. Send us a message and we&apos;ll respond as soon as possible.
           </motion.p>
           
           <div className="space-y-6">
