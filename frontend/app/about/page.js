@@ -1,5 +1,3 @@
-"use client";
-
 import { Target, Sparkles, FileText, Calendar, MessageSquare, GraduationCap, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -21,19 +19,19 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-[#f7f2eb] flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Decorative Background Elements */}
-      <motion.div 
+      <motion.div
         animate={{ scale: [1, 1.1, 1], rotate: [0, 90, 0] }}
         transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         className="absolute top-[-10%] right-[-5%] w-[40vw] h-[40vw] bg-[#8b9a6e]/10 rounded-full blur-[100px] pointer-events-none"
       />
-      <motion.div 
+      <motion.div
         animate={{ scale: [1, 1.2, 1], rotate: [0, -90, 0] }}
         transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
         className="absolute bottom-[-10%] left-[-5%] w-[35vw] h-[35vw] bg-[#eae2d6]/40 rounded-full blur-[100px] pointer-events-none"
       />
 
       <div className="max-w-4xl w-full relative z-10">
-        <motion.div 
+        <motion.div
           initial="hidden"
           animate="visible"
           variants={staggerContainer}
@@ -47,18 +45,18 @@ export default function AboutPage() {
           </motion.p>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.3 }}
           className="bg-white/60 backdrop-blur-lg rounded-3xl shadow-xl border border-white/50 p-8 sm:p-12"
         >
           <div className="space-y-12">
-            
-            <motion.section 
-              initial="hidden" 
-              whileInView="visible" 
-              viewport={{ once: true, margin: "-50px" }} 
+
+            <motion.section
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
               variants={fadeInUp}
             >
               <h2 className="text-2xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
@@ -73,9 +71,9 @@ export default function AboutPage() {
             </motion.section>
 
             <motion.section
-              initial="hidden" 
-              whileInView="visible" 
-              viewport={{ once: true, margin: "-50px" }} 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
               variants={staggerContainer}
             >
               <motion.h2 variants={fadeInUp} className="text-2xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
@@ -116,7 +114,7 @@ export default function AboutPage() {
               </motion.div>
             </motion.section>
 
-            <motion.section 
+            <motion.section
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
@@ -126,11 +124,11 @@ export default function AboutPage() {
               {/* Decorative elements */}
               <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-[#8b9a6e] rounded-full blur-2xl opacity-20"></div>
               <div className="absolute bottom-0 left-0 -mb-4 -ml-4 w-24 h-24 bg-[#eae2d6] rounded-full blur-2xl opacity-10"></div>
-              
+
               <h2 className="text-2xl font-semibold text-white mb-4 relative z-10">Ready to accelerate your career?</h2>
               <p className="text-gray-300 mb-8 relative z-10">Join thousands of students who have already found their dream jobs.</p>
-              <Link 
-                href="/login" 
+              <Link
+                href="/login"
                 className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-[#8b9a6e] text-white font-medium hover:bg-[#7b8a5e] transition-all shadow-lg hover:shadow-[#8b9a6e]/30 relative z-10"
               >
                 Get Started Today
